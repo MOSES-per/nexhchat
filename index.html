@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus Spark - Connect Through Activities</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans: ['Inter', 'sans-serif'] },
+  colors: { dark: { 950: '#09090b', 900: '#121215', 800: '#1c1c21', 700: '#27272e' } }
+} } }
+</script>
+<style type="text/tailwindcss">
+  .inp { @apply w-full bg-dark-800 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-indigo-500; }
+  .opt { @apply rounded-xl border border-zinc-700 bg-dark-800 text-zinc-300 hover:text-white transition-all; }
+  .opt.on { @apply border-indigo-500 bg-indigo-600/20 text-white; }
+  .ibtn { @apply p-3.5 rounded-2xl bg-dark-800 hover:bg-dark-700 text-white border border-zinc-700/60 transition-all; }
+  .ibtn.off { @apply bg-rose-600 hover:bg-rose-500 border-rose-500; }
+  .ibtn.live { @apply bg-indigo-600 hover:bg-indigo-500 border-indigo-500; }
+  .primary { @apply rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all; }
+</style>
+</head>
+<body class="bg-dark-950 text-zinc-100 font-sans antialiased overflow-hidden selection:bg-indigo-500 selection:text-white">
+<div id="app" class="h-screen w-screen flex flex-col">
+
+<!-- ============ LOBBY ============ -->
+<div id="lobby-screen" class="flex-1 flex flex-col items-center justify-start sm:justify-center p-4 sm:p-6 overflow-y-auto">
+  <div class="w-full max-w-6xl flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20"><i data-lucide="sparkles" class="w-5 h-5 text-white"></i></div>
+      <div>
+        <span class="text-xl font-bold tracking-tight">Nexus<span class="text-indigo-400">Spark</span></span>
+        <span class="hidden sm:inline-block ml-2 text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">3 Quests to Unlock Video</span>
+      </div>
+    </div>
+    <div id="connection-status-pill" class="text-xs sm:text-sm text-zinc-400 bg-dark-800 px-3 py-1.5 rounded-full border border-zinc-800 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Connecting Online...
+    </div>
+  </div>
+
+  <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div class="lg:col-span-7 bg-dark-900 p-5 sm:p-7 rounded-2xl border border-zinc-800/80 shadow-xl flex flex-col gap-5">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-white">Set Your Vibe & Purpose</h1>
+        <p class="text-xs sm:text-sm text-zinc-400 mt-1">Your 3 icebreaker activities adapt to your gender and why you're joining today.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Display Name</label>
+          <input type="text" id="username-input" value="Alex Rivera" maxlength="30" placeholder="Enter your name" class="inp">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-1.5">Your Gender</label>
+          <div class="grid grid-cols-3 gap-2" id="gender-selector">
+            <button type="button" onclick="selectGender('Female')" data-gender="Female" class="gender-btn opt py-2.5 px-3 text-xs font-medium">👩 Female</button>
+            <button type="button" onclick="selectGender('Male')" data-gender="Male" class="gender-btn opt on py-2.5 px-3 text-xs font-medium">👨 Male</button>
+            <button type="button" onclick="selectGender('Non-Binary')" data-gender="Non-Binary" class="gender-btn opt py-2.5 px-3 text-xs font-medium">✨ Non-Binary</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Purpose of Joining</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="purpose-selector">
+          <button type="button" onclick="selectPurpose('soulmate')" data-purpose="soulmate" class="purpose-btn opt on p-3 text-left flex flex-col gap-1"><span class="text-lg">❤️</span><span class="text-xs font-semibold text-white">Soulmate</span><span class="text-[11px] text-zinc-400 leading-tight">Romantic spark & chemistry</span></button>
+          <button type="button" onclick="selectPurpose('friend')" data-purpose="friend" class="purpose-btn opt p-3 text-left flex flex-col gap-1"><span class="text-lg">🤝</span><span class="text-xs font-semibold text-white">Find a Friend</span><span class="text-[11px] text-zinc-400 leading-tight">Genuine buddies & hobbies</span></button>
+          <button type="button" onclick="selectPurpose('timepass')" data-purpose="timepass" class="purpose-btn opt p-3 text-left flex flex-col gap-1"><span class="text-lg">🎲</span><span class="text-xs font-semibold text-white">Fun Timepass</span><span class="text-[11px] text-zinc-400 leading-tight">Quirky games & laughs</span></button>
+          <button type="button" onclick="selectPurpose('professional')" data-purpose="professional" class="purpose-btn opt p-3 text-left flex flex-col gap-1"><span class="text-lg">💼</span><span class="text-xs font-semibold text-white">Professional</span><span class="text-[11px] text-zinc-400 leading-tight">Stream networking</span></button>
+        </div>
+      </div>
+
+      <div id="stream-selector-container" class="hidden bg-dark-800/70 p-3.5 rounded-xl border border-zinc-700/80">
+        <label class="block text-xs font-medium text-indigo-300 uppercase tracking-wider mb-2">Select Your Professional Stream</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button type="button" onclick="selectStream('Tech & AI')" data-stream="Tech & AI" class="stream-btn opt on py-2 px-2.5 text-xs font-medium">💻 Tech & AI</button>
+          <button type="button" onclick="selectStream('Design & Media')" data-stream="Design & Media" class="stream-btn opt py-2 px-2.5 text-xs font-medium">🎨 Design & Media</button>
+          <button type="button" onclick="selectStream('Finance & Biz')" data-stream="Finance & Biz" class="stream-btn opt py-2 px-2.5 text-xs font-medium">📈 Finance & Biz</button>
+          <button type="button" onclick="selectStream('Med & Science')" data-stream="Med & Science" class="stream-btn opt py-2 px-2.5 text-xs font-medium">🧬 Med & Science</button>
+        </div>
+      </div>
+
+      <div id="interest-container" class="bg-dark-800/70 p-3.5 rounded-xl border border-zinc-700/80">
+        <label class="block text-xs font-medium text-pink-300 uppercase tracking-wider mb-2">I'm interested in</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="selectInterest('Male')" data-interest="Male" class="interest-btn opt py-2 px-2.5 text-xs font-medium">👨 Men</button>
+          <button type="button" onclick="selectInterest('Female')" data-interest="Female" class="interest-btn opt on py-2 px-2.5 text-xs font-medium">👩 Women</button>
+        </div>
+        <p class="text-[11px] text-zinc-500 mt-2">You only match with people who are interested in your gender too.</p>
+      </div>
+
+      <div class="bg-dark-950/70 border border-zinc-800 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Your 3 Activities to Unlock Video Call</span>
+          <span id="lobby-quest-badge" class="text-[11px] text-zinc-400"></span>
+        </div>
+        <div id="lobby-activity-preview" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5"></div>
+      </div>
+
+      <label class="flex items-start gap-2.5 text-xs text-zinc-400 cursor-pointer">
+        <input type="checkbox" id="age-check" class="mt-0.5 accent-indigo-500">
+        <span>I am 18 or older and will be respectful. I can report or block anyone at any time.</span>
+      </label>
+
+      <div class="flex flex-col sm:flex-row gap-2.5">
+        <button onclick="joinRandomRoom()" class="flex-1 py-3.5 px-5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2">
+          <i data-lucide="shuffle" class="w-4 h-4"></i><span>Match Online (Live Queue)</span>
+        </button>
+        <button onclick="startSimulatedMatch()" class="py-3.5 px-5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-2" title="Test the 3 activities with a demo partner">
+          <i data-lucide="bot" class="w-4 h-4"></i><span>Instant Demo Partner</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="lg:col-span-5 flex flex-col gap-4">
+      <div class="relative aspect-video w-full bg-dark-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl flex items-center justify-center">
+        <video id="lobby-video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100 hidden"></video>
+        <div id="lobby-placeholder" class="flex flex-col items-center justify-center text-center p-6">
+          <div class="w-16 h-16 rounded-full bg-dark-800 border border-zinc-700 flex items-center justify-center mb-3"><i data-lucide="user" class="w-8 h-8 text-zinc-400"></i></div>
+          <p id="lobby-status-text" class="text-zinc-300 text-sm font-medium">Camera Ready for Snapshot & Video</p>
+          <p class="text-xs text-zinc-500 mt-1 max-w-xs">Your live video stays hidden until both of you finish all 3 activities!</p>
+        </div>
+        <div class="absolute top-3 left-3 bg-dark-950/80 backdrop-blur-md px-3 py-1 rounded-full border border-zinc-800 text-[11px] text-amber-400 flex items-center gap-1.5"><i data-lucide="eye-off" class="w-3.5 h-3.5"></i> Hidden until 3/3 Quests Done</div>
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-dark-950/80 backdrop-blur-md px-4 py-1.5 rounded-full border border-zinc-800/80">
+          <button id="lobby-mic-btn" onclick="toggleMic()" class="ibtn !p-2.5 !rounded-full" title="Toggle Microphone"><i data-lucide="mic" class="w-4 h-4"></i></button>
+          <button id="lobby-cam-btn" onclick="toggleCam()" class="ibtn !p-2.5 !rounded-full" title="Toggle Camera"><i data-lucide="video" class="w-4 h-4"></i></button>
+        </div>
+      </div>
+
+      <div class="bg-dark-900 p-5 rounded-2xl border border-zinc-800/80 flex flex-col gap-3">
+        <label class="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Or Join Private Room Code</label>
+        <div class="flex gap-2">
+          <input type="text" id="room-input" value="nxm-849-201" maxlength="30" class="inp flex-1 !font-mono !text-indigo-300">
+          <button onclick="generateRoomCode()" class="px-3 opt" title="Generate New Room"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+          <button onclick="joinCode()" class="px-4 py-2.5 rounded-xl bg-dark-800 hover:bg-indigo-600 border border-zinc-700 hover:border-indigo-500 text-white text-xs font-semibold transition-all">Join Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ROOM ============ -->
+<div id="room-screen" class="hidden flex-1 flex flex-col h-full overflow-hidden">
+  <header class="h-16 px-4 sm:px-6 border-b border-zinc-800/80 bg-dark-900/90 backdrop-blur-md flex items-center justify-between shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-pink-500 flex items-center justify-center"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h2 id="room-title-display" class="font-semibold text-sm sm:text-base text-white">Soulmate Room</h2>
+          <span id="purpose-pill-header" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/30"></span>
+        </div>
+        <p id="meeting-timer" class="text-xs text-zinc-400 font-mono">00:00</p>
+      </div>
+    </div>
+
+    <div class="hidden md:flex items-center bg-dark-800 p-1 rounded-xl border border-zinc-700/70">
+      <button id="view-quest-btn" onclick="switchStageView('quest')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-all flex items-center gap-1.5"><i data-lucide="flame" class="w-3.5 h-3.5"></i><span>1. Icebreaker Quests (<span id="header-quest-count">0/3</span>)</span></button>
+      <button id="view-video-btn" onclick="switchStageView('video')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition-all flex items-center gap-1.5"><span id="video-tab-lock-wrapper" class="inline-flex items-center"><i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i></span><span>2. Live Video Call</span></button>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button id="simulate-partner-btn" onclick="simulatePartnerStep()" class="hidden items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 px-3 py-1.5 rounded-xl text-xs font-medium text-amber-300 transition-all"><i data-lucide="zap" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Simulate Partner</span></button>
+      <button id="next-random-btn" onclick="nextRandomRoom()" class="hidden items-center gap-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 px-3 py-1.5 rounded-xl text-xs font-medium text-emerald-300 transition-all"><i data-lucide="skip-forward" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Next Match</span></button>
+      <button onclick="openReport()" class="flex items-center gap-1.5 bg-rose-600/15 hover:bg-rose-600/30 border border-rose-500/40 px-3 py-1.5 rounded-xl text-xs font-medium text-rose-300 transition-all" title="Report or block your partner"><i data-lucide="flag" class="w-3.5 h-3.5"></i><span class="hidden sm:inline">Report / Block</span></button>
+      <button onclick="copyRoomLink()" class="flex items-center gap-2 bg-dark-800 hover:bg-dark-700 border border-zinc-700/80 px-3 py-1.5 rounded-xl text-xs font-mono text-zinc-300 transition-all"><span id="active-room-code">nxm-849-201</span><i data-lucide="copy" class="w-3.5 h-3.5 text-zinc-400"></i></button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+    <!-- Quest stage -->
+    <div id="quest-stage" class="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+      <div class="lg:col-span-7 p-4 sm:p-6 overflow-y-auto flex flex-col gap-5 border-r border-zinc-800/80">
+        <div class="bg-gradient-to-r from-dark-900 via-indigo-950/40 to-dark-900 p-5 rounded-2xl border border-indigo-500/30 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div id="unlock-status-icon" class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0"><i data-lucide="lock" class="w-6 h-6"></i></div>
+              <div>
+                <h3 id="unlock-banner-title" class="text-base sm:text-lg font-bold text-white">Complete 3 Activities to Unlock Video Call</h3>
+                <p id="unlock-banner-subtitle" class="text-xs text-zinc-400 mt-0.5">Both you and your match must complete the 3 tailored quests below.</p>
+              </div>
+            </div>
+            <button id="launch-video-call-btn" onclick="switchStageView('video')" disabled class="px-5 py-3 rounded-xl bg-zinc-800 text-zinc-500 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-not-allowed shrink-0"><i data-lucide="video" class="w-4 h-4"></i><span>Video Locked</span></button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-zinc-800/80">
+            <div>
+              <div class="flex justify-between text-xs mb-1.5"><span class="text-zinc-300 font-medium">Your Progress (<span id="my-role-label">Male</span>)</span><span id="my-quest-score" class="text-indigo-400 font-bold">0 / 3 Done</span></div>
+              <div class="w-full h-2 bg-dark-800 rounded-full overflow-hidden"><div id="my-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1.5"><span id="partner-progress-name" class="text-zinc-300 font-medium">Partner's Progress</span><span id="partner-quest-score" class="text-emerald-400 font-bold">0 / 3 Done</span></div>
+              <div class="w-full h-2 bg-dark-800 rounded-full overflow-hidden"><div id="partner-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div id="quest-cards-container" class="space-y-4"></div>
+      </div>
+
+      <div class="lg:col-span-5 bg-dark-900/60 flex flex-col h-full overflow-hidden">
+        <div class="p-3.5 border-b border-zinc-800 flex items-center justify-between bg-dark-900">
+          <div class="flex items-center gap-2"><i data-lucide="messages-square" class="w-4 h-4 text-indigo-400"></i><span class="text-xs sm:text-sm font-semibold text-white">Live Chat & Activity Feed</span></div>
+          <span id="chat-partner-status" class="text-[11px] text-zinc-400 bg-dark-800 px-2.5 py-0.5 rounded-full border border-zinc-700">Waiting for partner</span>
+        </div>
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3"></div>
+        <form onsubmit="sendChatMessage(event)" class="p-3 border-t border-zinc-800 bg-dark-900 flex gap-2">
+          <input type="text" id="chat-input" maxlength="500" placeholder="Chat with your match while doing activities..." autocomplete="off" class="inp flex-1">
+          <button type="submit" class="px-4 py-2.5 primary flex items-center gap-1.5"><span>Send</span><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Video stage -->
+    <main id="video-stage" class="hidden flex-1 p-3 sm:p-5 overflow-y-auto flex flex-col items-center justify-center gap-4">
+      <div class="w-full max-w-6xl flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 px-4 py-2.5 rounded-2xl">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-emerald-300 font-medium"><i data-lucide="unlock" class="w-4 h-4"></i><span>All 3 Activities Completed! Live Video & Audio Call Unlocked.</span></div>
+        <button onclick="switchStageView('quest')" class="text-xs text-zinc-300 hover:text-white bg-dark-800 px-3 py-1.5 rounded-xl border border-zinc-700">Back to Quests & Chat</button>
+      </div>
+      <div id="video-grid" class="w-full flex-1 max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 auto-rows-fr">
+        <div id="local-tile" class="relative bg-dark-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-lg flex items-center justify-center">
+          <video id="local-video" autoplay playsinline muted class="w-full h-full object-cover transform -scale-x-100 hidden"></video>
+          <div id="local-avatar" class="flex flex-col items-center justify-center"><div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-2xl sm:text-3xl font-bold text-white shadow-lg"><span id="local-initials">AR</span></div></div>
+          <div id="screen-share-badge" class="hidden absolute top-3 left-3 bg-indigo-600/90 backdrop-blur-md text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1.5 shadow"><i data-lucide="monitor" class="w-3.5 h-3.5"></i> You are sharing screen</div>
+          <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+            <div class="bg-dark-950/75 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800/80"><span id="local-name-tag" class="text-xs sm:text-sm font-medium text-white">Alex Rivera (You)</span></div>
+            <div id="local-mic-indicator" class="w-8 h-8 rounded-xl bg-dark-950/75 backdrop-blur-md border border-zinc-800/80 flex items-center justify-center text-emerald-400"><i data-lucide="mic" class="w-4 h-4"></i></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="reactions-overlay" class="pointer-events-none fixed inset-0 overflow-hidden z-30"></div>
+
+    <!-- Side drawer -->
+    <aside id="side-drawer" class="hidden w-full sm:w-80 md:w-96 bg-dark-900 border-l border-zinc-800 flex flex-col shrink-0 z-20 absolute sm:relative inset-0 sm:inset-auto">
+      <div class="p-3 border-b border-zinc-800 flex items-center justify-between">
+        <div class="flex bg-dark-800 p-1 rounded-xl w-full mr-2">
+          <button onclick="switchTab('chat')" id="tab-chat" class="flex-1 py-1.5 text-xs font-medium rounded-lg bg-dark-700 text-white transition-all">In-Call Chat</button>
+          <button onclick="switchTab('participants')" id="tab-participants" class="flex-1 py-1.5 text-xs font-medium rounded-lg text-zinc-400 hover:text-white transition-all">People (<span id="participant-count">1</span>)</button>
+        </div>
+        <button onclick="toggleDrawer()" class="p-2 rounded-xl hover:bg-dark-800 text-zinc-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div id="panel-chat" class="flex-1 flex flex-col overflow-hidden p-4 justify-center items-center text-center">
+        <i data-lucide="sparkles" class="w-8 h-8 text-indigo-400 mb-2"></i>
+        <p class="text-sm text-white font-medium">Live Chat is on the Quest Dashboard</p>
+        <p class="text-xs text-zinc-400 mt-1 mb-4">Switch to the Icebreaker Quest view to chat and view shared snapshots.</p>
+        <button onclick="switchStageView('quest'); toggleDrawer();" class="px-4 py-2 primary">Open Quest & Chat View</button>
+      </div>
+      <div id="panel-participants" class="hidden flex-1 p-4 overflow-y-auto space-y-3">
+        <div id="participants-list" class="space-y-2 pt-1"></div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="h-20 px-4 bg-dark-900 border-t border-zinc-800/80 flex items-center justify-between shrink-0 z-10">
+    <div class="hidden md:flex items-center gap-2 text-xs text-zinc-400 w-48"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i><span>Encrypted P2P Stream</span></div>
+    <div class="flex items-center justify-center gap-2 sm:gap-3 mx-auto">
+      <button id="room-mic-btn" onclick="toggleMic()" class="ibtn" title="Mute / Unmute"><i data-lucide="mic" class="w-5 h-5"></i></button>
+      <button id="room-cam-btn" onclick="toggleCam()" class="ibtn" title="Start / Stop Video"><i data-lucide="video" class="w-5 h-5"></i></button>
+      <button id="screen-share-btn" onclick="toggleScreenShare()" class="ibtn" title="Share Screen"><i data-lucide="monitor-up" class="w-5 h-5"></i></button>
+      <div class="relative">
+        <button onclick="toggleReactionMenu()" class="ibtn" title="Send Reaction"><i data-lucide="smile" class="w-5 h-5"></i></button>
+        <div id="reaction-menu" class="hidden absolute bottom-16 left-1/2 -translate-x-1/2 bg-dark-800 border border-zinc-700 p-2 rounded-2xl shadow-2xl flex items-center gap-1.5">
+          <button onclick="triggerReaction('👍')" class="p-2 hover:bg-dark-700 rounded-xl text-xl hover:scale-125 transition-transform">👍</button>
+          <button onclick="triggerReaction('❤️')" class="p-2 hover:bg-dark-700 rounded-xl text-xl hover:scale-125 transition-transform">❤️</button>
+          <button onclick="triggerReaction('👏')" class="p-2 hover:bg-dark-700 rounded-xl text-xl hover:scale-125 transition-transform">👏</button>
+          <button onclick="triggerReaction('🎉')" class="p-2 hover:bg-dark-700 rounded-xl text-xl hover:scale-125 transition-transform">🎉</button>
+          <button onclick="triggerReaction('🔥')" class="p-2 hover:bg-dark-700 rounded-xl text-xl hover:scale-125 transition-transform">🔥</button>
+        </div>
+      </div>
+      <button onclick="leaveMeeting()" class="px-5 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-medium text-sm flex items-center gap-2 shadow-lg shadow-rose-600/20 transition-all ml-1" title="Leave Call"><i data-lucide="phone-off" class="w-5 h-5"></i><span class="hidden sm:inline">Leave</span></button>
+    </div>
+    <div class="flex items-center justify-end gap-2 sm:w-48">
+      <button onclick="openDrawerTab('chat')" class="relative ibtn !p-3" title="Chat"><i data-lucide="message-square" class="w-5 h-5"></i><span id="chat-badge" class="hidden absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-indigo-500"></span></button>
+      <button onclick="openDrawerTab('participants')" class="ibtn !p-3 hidden sm:flex items-center gap-1.5" title="Participants"><i data-lucide="users" class="w-5 h-5"></i><span id="footer-peer-count" class="text-xs font-semibold">1</span></button>
+    </div>
+  </footer>
+</div>
+</div>
+
+<!-- Report / block modal -->
+<div id="report-modal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+  <div class="bg-dark-900 border border-zinc-700 rounded-2xl p-5 w-full max-w-sm space-y-3">
+    <h3 class="font-bold text-white">Report or block your partner</h3>
+    <p class="text-xs text-zinc-400">You will leave the call and won't be matched with this person again on this device.</p>
+    <select id="report-reason" class="inp">
+      <option value="block-only">Just block (no report)</option>
+      <option>Harassment or abuse</option>
+      <option>Nudity or sexual content</option>
+      <option>Appears to be under 18</option>
+      <option>Spam or scam</option>
+      <option>Other</option>
+    </select>
+    <div class="flex gap-2">
+      <button onclick="closeReport()" class="flex-1 py-2.5 opt text-xs">Cancel</button>
+      <button onclick="submitReport()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold">Block & leave</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 -translate-y-2">
+  <div class="bg-dark-800 border border-zinc-700 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-2">
+    <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i><span id="toast-message">Notification</span>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+// ===== CONFIG =====
+// Inside Google Canvas the config is injected automatically.
+// When self-hosting (Vercel etc.), paste your Firebase web config here:
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCJN_Wvg3QwyRy28UIh_hgk0m0GYD00MI8",
+  authDomain: "nexchat-d8d93.firebaseapp.com",
+  projectId: "nexchat-d8d93",
+  storageBucket: "nexchat-d8d93.firebasestorage.app",
+  messagingSenderId: "544972729539",
+  appId: "1:544972729539:web:831730fbf1afeedf208676"
+}; // e.g. { apiKey: "...", authDomain: "...", projectId: "...", appId: "..." }
+
+// Optional TURN server for users behind strict NATs (e.g. from metered.ca or Twilio):
+const TURN_SERVER = null; // e.g. { urls: 'turn:YOUR_HOST:3478', username: 'user', credential: 'pass' }
+
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'nexus-meet-default';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : FIREBASE_CONFIG;
+
+const rtcConfig = { iceServers: [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  ...(TURN_SERVER ? [TURN_SERVER] : [])
+] };
+
+let app, auth, db, currentUser = null;
+const $ = (id) => document.getElementById(id);
+const pub = (name, ...rest) => [db, 'artifacts', appId, 'public', 'data', name, ...rest];
+
+const state = {
+  localStream: null, screenStream: null, micEnabled: true, camEnabled: true, isScreenSharing: false,
+  isRandomMode: false, isSimulatedPartner: false, username: 'Alex Rivera', gender: 'Male',
+  purpose: 'soulmate', streamType: 'Tech & AI', roomCode: 'nxm-849-201', inMeeting: false,
+  interest: 'Female', myAnswers: {}, myVerdicts: {}, partner: { answers: {}, verdicts: {}, mediaReady: false }, mediaReady: false, soulStream: null,
+  stageView: 'quest', activities: [], myCompleted: { 0: false, 1: false, 2: false },
+  partnerCompleted: { 0: false, 1: false, 2: false }, videoUnlocked: false, drawerOpen: false,
+  activeTab: 'participants', timerSeconds: 0, timerInterval: null, heartbeatInterval: null, peers: {},
+  unsubRoomPeers: null, unsubSignals: null, unsubChat: null, unsubReactions: null
+};
+
+// ===== Blocked users (kept on this device) =====
+function getBlocked() { try { return new Set(JSON.parse(localStorage.getItem('ns_blocked') || '[]')); } catch (e) { return new Set(); } }
+function addBlocked(uid) { try { const s = getBlocked(); s.add(uid); localStorage.setItem('ns_blocked', JSON.stringify([...s])); } catch (e) {} }
+
+// ===== Activities =====
+const PURPOSE_LABELS = {
+  soulmate: { icon: '❤️', title: 'Soulmate Connection' },
+  friend: { icon: '🤝', title: 'Friendship Vibe' },
+  timepass: { icon: '🎲', title: 'Fun Timepass' },
+  professional: { icon: '💼', title: 'Professional Network' }
+};
+const act = (type, icon, badge, title, desc, x = {}) => ({ type, icon, badge, title, desc, ...x });
+
+function generateDynamicActivities(purpose, gender, s) {
+  if (purpose === 'soulmate') {
+    const p = gender === 'Female' ? 'Write 2 qualities that immediately make you feel safe and genuinely understood by a partner.'
+      : gender === 'Male' ? 'Write a thoughtful, genuine first-impression compliment or what caught your attention about your match.'
+      : 'Share your favorite romantic green flag and what makes your heart skip a beat.';
+    return [
+      act('photo', 'camera', 'Activity 1 • Visual Spark', 'Share a Live Smile Selfie or Something Red/Cozy Near You', 'Snap a quick frame from your camera so your match sees your real energy!', { buttonText: 'Snap & Share Photo to Chat' }),
+      act('text', 'heart-handshake', `Activity 2 • Heart Note (${gender} Edition)`, 'Write Something About the Other Person / Green Flag', p, { placeholder: 'Write your heartfelt note for your match...', buttonText: 'Send Heart Note' }),
+      act('choice', 'sparkles', 'Activity 3 • Spontaneous Date Vibe', 'Pick Our Ideal First Hangout Scenario', 'Select the date vibe you would take the other person on right now:', { options: ['🌙 Late-night street food & rooftop stargazing', '☕ Cozy rainy-day bookstore & artisan coffee', '🌅 Sunset beach walk with acoustic music', '🎢 Spontaneous arcade battle & ice cream'] })
+    ];
+  }
+  if (purpose === 'friend') {
+    const p = gender === 'Female' ? 'Describe what kind of chaotic or wholesome best-friend energy you bring to the squad!'
+      : gender === 'Male' ? 'Write a hype intro for your match and mention one hobby you could both geek out over.'
+      : 'Write what makes someone an instant 3 AM ride-or-die friend for you.';
+    return [
+      act('photo', 'coffee', 'Activity 1 • Desk / Mug Check', 'Show an Object Within Arm’s Reach Right Now', 'Snap a photo of your coffee mug, pet, headphones, or desk item that represents your personality!', { buttonText: 'Snap & Share Object' }),
+      act('text', 'message-circle-heart', `Activity 2 • Squad Intro (${gender} Prompt)`, 'Write a Friendly Roast or Hype Note for Your Match', p, { placeholder: 'E.g., You seem like someone who has elite music taste...', buttonText: 'Post to Chat' }),
+      act('choice', 'compass', 'Activity 3 • Weekend Crew Pact', 'Pick Our Ultimate Friend Hangout', 'Choose what we are doing if we hang out this weekend:', { options: ['🎮 Co-op gaming marathon with loaded nachos', '🚗 Spontaneous road trip with no map', '🍕 Trying the weirdest-rated food spot in town', '🎬 Binge-watching sci-fi/thrillers & debating theories'] })
+    ];
+  }
+  if (purpose === 'timepass') {
+    return [
+      act('photo', 'laugh', 'Activity 1 • Silly Face / Peace Sign Challenge', 'Share a Dramatic Peace Sign or Mystery Hand Pose', 'No boring poses allowed! Snap a quick fun pose to break the ice.', { buttonText: 'Snap Fun Pose' }),
+      act('text', 'wand-2', 'Activity 2 • Wild Guess About Your Match', 'Guess One Totally Random Thing About the Other Person', `As a ${gender} detective, guess their favorite midnight snack, superpower, or guilty pleasure song!`, { placeholder: 'I bet you secretly listen to 2000s pop at 2 AM...', buttonText: 'Lock In My Guess' }),
+      act('choice', 'flame', 'Activity 3 • Rapid-Fire Hot Take', 'Defend a Ridiculous Unpopular Opinion', 'Pick the chaotic take you stand by to unlock the video call:', { options: ['🍍 Pineapple on pizza is actually a culinary masterpiece', '🥣 Cereal is technically a cold breakfast soup', '👽 Aliens have visited Earth but left because of traffic', '🐱 Cats are actually tiny furry managers supervising us'] })
+    ];
+  }
+  return [
+    act('photo', 'laptop', `Activity 1 • ${s} Workspace Snapshot`, 'Share Your Current Desk Setup, Notebook, or Gear', `Show a glimpse of your ${s} setup before jumping on the networking call.`, { buttonText: 'Share Workspace Snapshot' }),
+    act('text', 'briefcase', `Activity 2 • ${s} Collaboration Pitch`, 'Write How You & Your Match Could Collaborate', `Share what you're building in ${s} (${gender} perspective) and one skill you admire in peers.`, { placeholder: `In ${s}, I'm currently exploring... Let's collaborate on...`, buttonText: 'Share Pitch Note' }),
+    act('choice', 'rocket', `Activity 3 • ${s} Brainstorm Topic`, 'Pick Our 5-Minute Video Call Speed-Topic', 'Choose what we will brainstorm first once our video call unlocks:', { options: [`🚀 Co-founding a side project in ${s}`, '💡 Swapping career growth hacks & portfolio feedback', '🤖 How AI is transforming our daily workflow in 2026', '☕ Casual virtual coffee & industry war stories'] })
+  ];
+}
+
+// ===== Soulmate mode: 50-question pool (3 picked per room, identical for both people) =====
+const T = (q) => ({ t: 'text', q }), C = (q, o) => ({ t: 'choice', q, o }), P = (q) => ({ t: 'photo', q }), S = (q, a, b) => ({ t: 'side', q, o: [a, b] });
+const SOUL_POOL = [
+  T("Your most irresistible quality?"), T("Describe your kiss in one word."), T("Biggest turn-on, besides looks?"), T("Your best pickup line?"),
+  T("Your love language?"), T("First thing you'd do on our date?"), T("Something you're dangerously good at?"), T("A red flag you secretly find cute?"),
+  T("Guilty pleasure you'd admit to me?"), T("A pet name you'd give me?"), T("Song for our first dance?"), T("Your 2 AM text to me?"),
+  T("What makes you blush instantly?"), T("Our perfect Sunday in 3 words?"), T("Most attractive thing someone can wear?"), T("Your biggest green flag?"),
+  T("Your flirting style in one word?"), T("Where would you steal a kiss?"), T("Describe me after 1 minute."), T("One bold dare you'd do for me?"),
+  C("Where's our first date?", ["🌙 Rooftop dinner", "🚗 Midnight drive", "🔥 Beach bonfire", "🍳 Cooking together"]),
+  C("Best setting for a first kiss?", ["🌧️ In the rain", "💃 Dance floor", "🌅 At sunset", "🛗 Stuck in a lift"]),
+  C("How do you flirt?", ["👀 Eye contact", "😏 Teasing", "💬 Compliments", "🎲 Playful dares"]),
+  C("Your date-night vibe?", ["🎩 Classy", "😎 Casual cool", "🖤 Dark & mysterious", "✨ Bold & flashy"]),
+  C("Pick our getaway.", ["🏖️ Beach villa", "🏔️ Mountain cabin", "🌃 City lights", "🛣️ Road trip"]),
+  C("Midnight snack date?", ["🍦 Ice cream", "🍕 Pizza", "🍫 Chocolate", "🍜 Maggi"]),
+  C("What melts you?", ["🎙️ A voice", "😊 A smile", "😂 Humour", "💪 Confidence"]),
+  C("Movie night pick?", ["💕 Romance", "🔪 Thriller", "🤣 Comedy", "👻 Horror (cuddle excuse)"]),
+  C("Pick my pet name.", ["Babe", "Trouble", "Sunshine", "Gorgeous"]),
+  C("Our love song is...", ["🎷 Slow jam", "🎬 Bollywood romantic", "🎤 Pop banger", "🎸 Acoustic"]),
+  C("First gift you'd give me?", ["💐 Flowers", "🧴 Perfume", "🎧 A playlist", "✉️ Handwritten note"]),
+  C("Pick our adventure.", ["🏍️ Bike ride", "🌌 Stargazing", "🎤 Karaoke", "🚶 Late-night walk"]),
+  C("When's the first kiss?", ["First date", "Third date", "When it feels right", "Right now 😏"]),
+  C("Dream cuddle spot?", ["🛋️ Couch", "🌇 Balcony", "🏖️ Beach", "🏕️ Blanket fort"]),
+  C("Our story is a...", ["🔥 Slow burn", "⚡ Love at first sight", "⚔️ Enemies to lovers", "🤝 Friends to lovers"]),
+  P("Show your best flirty smile 😏"), P("Show your date-night look."), P("Show your cutest wink."), P("Show your best smoldering look."),
+  P("Show the view around you right now."), P("Show your favourite accessory."), P("Catch yourself mid-laugh."), P("Show your coolest pose."),
+  P("Make a heart with your hands ❤️"), P("Show what you're holding right now."),
+  S("Cuddles or kisses?", "🤗 Cuddles", "💋 Kisses"), S("Planned or spontaneous date?", "📅 Planned", "🎲 Spontaneous"),
+  S("Text all day or call at night?", "💬 Text", "📞 Call"), S("Sunrise or sunset date?", "🌅 Sunrise", "🌇 Sunset"),
+  S("Dance floor or candlelight?", "💃 Dance floor", "🕯️ Candlelight")
+];
+const SOUL_PREVIEW = '<div class="sm:col-span-3 text-xs text-zinc-300 bg-dark-900 border border-zinc-800 rounded-xl p-3">🔥 3 surprise questions from a pool of 50, the same for both of you. Short answers only. Your camera asks for permission only when a photo question appears.</div>';
+
+function seededRand(seed) {
+  let h = 2166136261;
+  for (const ch of seed) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return () => { h += 0x6D2B79F5; let t = Math.imul(h ^ h >>> 15, 1 | h); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+}
+// Always 1 photo + 1 text + 1 of any type, in random order. Same seed (room code) = same questions for both people.
+function pickQuestions(seed) {
+  const r = seededRand(seed), idx = SOUL_POOL.map((_, i) => i);
+  const take = (pred) => { const c = idx.filter(i => pred(SOUL_POOL[i])); const i = c[Math.floor(r() * c.length)]; idx.splice(idx.indexOf(i), 1); return i; };
+  const order = [take(q => q.t === 'photo'), take(q => q.t === 'text'), take(() => true)];
+  for (let i = 2; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  return order.map(i => SOUL_POOL[i]);
+}
+
+const soulCompatible = (d) => d.purpose === 'soulmate' && d.gender === state.interest && d.interest === state.gender;
+
+function recomputeSoul() {
+  [0, 1, 2].forEach(i => {
+    const m = state.myAnswers[i], pv = state.partner.verdicts[i], pa = state.partner.answers[i], mv = state.myVerdicts[i];
+    state.myCompleted[i] = !!(m && pv && pv.v === m.v && pv.s === 'ok');          // my answer approved by partner
+    state.partnerCompleted[i] = !!(pa && mv && mv.v === pa.v && mv.s === 'ok');   // partner's answer approved by me
+  });
+}
+
+function onSoulPartner(data) {
+  const next = { answers: data.answers || {}, verdicts: data.verdicts || {}, mediaReady: !!data.mediaReady };
+  $('partner-progress-name').textContent = `${data.name}'s Progress`;
+  if (JSON.stringify(next) === JSON.stringify(state.partner)) return;
+  state.partner = next; recomputeSoul(); renderQuestCards(); updateQuestProgressUI();
+}
+
+function ansHTML(a) {
+  if (!a) return '';
+  if (a.t === 'photo') return /^data:image\/jpeg;base64,/.test(a.val) ? `<img src="${a.val}" alt="photo" class="rounded-xl w-full max-w-[220px] mt-1">` : '';
+  return `<span class="text-white font-semibold">“${escapeHTML(a.val)}”</span>`;
+}
+
+function answerInput(i, q) {
+  if (q.t === 'text') return `<div class="mt-3 flex flex-col sm:flex-row gap-2"><input type="text" id="soul-in" maxlength="60" placeholder="Short answer, 1–3 words..." class="inp flex-1 !text-xs sm:!text-sm"><button onclick="soulText(${i})" class="px-4 py-2.5 primary shrink-0">Send</button></div>`;
+  if (q.t === 'photo') return `<div class="mt-3"><video id="soul-cam" autoplay playsinline muted class="hidden w-full max-w-[260px] rounded-xl -scale-x-100 mb-2"></video><div class="flex gap-2"><button id="soul-cam-open" onclick="openSoulCam()" class="px-4 py-2.5 primary">📷 Open camera</button><button id="soul-cam-snap" onclick="snapSoulPhoto(${i})" class="hidden px-4 py-2.5 primary">📸 Capture & send</button></div><p class="text-[11px] text-zinc-500 mt-1">Your browser asks for camera permission now. The camera switches off right after the photo.</p></div>`;
+  return `<div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">${q.o.map((o, oi) => `<button onclick="soulPick(${i},${oi})" class="opt p-2.5 text-left text-xs hover:!bg-indigo-600/20 hover:!border-indigo-500">${escapeHTML(o)}</button>`).join('')}</div>`;
+}
+
+function soulBody(i, q) {
+  const mine = state.myAnswers[i], pv = state.partner.verdicts[i], pa = state.partner.answers[i], mv = state.myVerdicts[i];
+  const redo = mine && pv && pv.v === mine.v && pv.s === 'redo', ok = mine && pv && pv.v === mine.v && pv.s === 'ok';
+  let h = '';
+  if (!mine || redo) h += (redo ? '<p class="text-xs text-amber-300 mt-2">Your match wants another try 🔁</p>' : '') + answerInput(i, q);
+  else h += `<div class="mt-3 text-xs text-zinc-400">You answered: ${ansHTML(mine)}<p class="mt-1">${ok ? '✅ Approved by your match' : '⏳ Waiting for your match to review'}</p></div>`;
+  if (!pa) return h + '<p class="text-xs text-zinc-500 mt-3">⏳ Waiting for your match to answer...</p>';
+  h += `<div class="mt-3 bg-dark-800 border border-zinc-700 rounded-xl p-3 text-xs text-zinc-400">Your match says:<div class="mt-1">${ansHTML(pa)}</div>`;
+  if (mv && mv.v === pa.v) h += `<p class="mt-2">${mv.s === 'ok' ? 'You approved ✅' : 'You asked for another try, waiting...'}</p>`;
+  else h += `<div class="flex flex-wrap gap-2 mt-3"><button onclick="reviewAnswer(${i},'ok')" class="px-3 py-2 primary">😍 Love it</button><button onclick="reviewAnswer(${i},'redo')" class="px-3 py-2 opt">🔁 Try again</button><button onclick="reviewAnswer(${i},'leave')" class="px-3 py-2 rounded-xl bg-rose-600/20 border border-rose-500/40 text-rose-300">🚪 Leave</button></div>`;
+  return h + '</div>';
+}
+
+function renderSoulCards() {
+  const kept = $('soul-in')?.value;
+  const done = (i) => state.myCompleted[i] && state.partnerCompleted[i];
+  const cur = [0, 1, 2].find(i => !done(i));
+  $('quest-cards-container').innerHTML = state.activities.map((q, i) => {
+    const icon = { text: '💬', choice: '🎯', photo: '📸', side: '⚔️' }[q.t];
+    const body = done(i) ? '<p class="text-xs text-emerald-300 mt-2">✅ You both loved each other\'s answers</p>'
+      : i === cur ? soulBody(i, q) : '<p class="text-xs text-zinc-500 mt-2">🔒 Revealed after the previous question</p>';
+    return `<div class="bg-dark-900 border ${done(i) ? 'border-emerald-500/40' : i === cur ? 'border-indigo-500/50' : 'border-zinc-800'} rounded-2xl p-4 sm:p-5">
+      <span class="text-[11px] font-bold tracking-wider ${done(i) ? 'text-emerald-400' : 'text-indigo-400'}">${icon} Question ${i + 1} of 3</span>
+      <h4 class="text-sm sm:text-base font-bold text-white mt-1">${escapeHTML(i > cur ? 'Hidden question' : q.q)}</h4>${body}</div>`;
+  }).join('');
+  if (kept && $('soul-in')) $('soul-in').value = kept;
+  if (state.soulStream && $('soul-cam')) {
+    $('soul-cam').srcObject = state.soulStream; $('soul-cam').classList.remove('hidden');
+    $('soul-cam-open').classList.add('hidden'); $('soul-cam-snap').classList.remove('hidden');
+  }
+}
+
+async function submitAnswer(i, t, val) {
+  const prev = state.myAnswers[i];
+  state.myAnswers[i] = { t, val, v: prev ? prev.v + 1 : 1 };
+  recomputeSoul(); renderQuestCards(); updateQuestProgressUI();
+  await syncLocalPresence();
+  if (state.isSimulatedPartner) simPartnerRespond(i);
+}
+window.soulText = (i) => {
+  const v = ($('soul-in')?.value || '').trim();
+  if (!v) { showToast('Type a short answer first'); return; }
+  if (v.split(/\s+/).length > 10) { showToast('Keep it under 10 words'); return; }
+  submitAnswer(i, 'text', v);
+};
+window.soulPick = (i, oi) => submitAnswer(i, 'pick', state.activities[i].o[oi]);
+window.openSoulCam = async () => {
+  try { state.soulStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false }); renderSoulCards(); }
+  catch (e) { showToast('Camera permission is needed for this question'); }
+};
+window.snapSoulPhoto = async (i) => {
+  const v = $('soul-cam');
+  if (!v || !v.videoWidth) { showToast('Camera is still starting, try again'); return; }
+  const c = document.createElement('canvas'); c.width = 240; c.height = Math.round(240 * v.videoHeight / v.videoWidth);
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  stopSoulCam();
+  await submitAnswer(i, 'photo', c.toDataURL('image/jpeg', 0.6));
+};
+function stopSoulCam() { state.soulStream?.getTracks().forEach(t => t.stop()); state.soulStream = null; }
+
+window.reviewAnswer = async (i, s) => {
+  if (s === 'leave') { await leaveMeeting(); return; }
+  const pa = state.partner.answers[i]; if (!pa) return;
+  state.myVerdicts[i] = { v: pa.v, s };
+  recomputeSoul(); renderQuestCards(); updateQuestProgressUI();
+  await syncLocalPresence();
+  if (state.isSimulatedPartner && s === 'redo') simPartnerRespond(i, true);
+};
+
+// Demo partner (Instant Demo Partner button)
+function demoPhoto() {
+  const c = document.createElement('canvas'); c.width = 240; c.height = 180; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 240, 180); g.addColorStop(0, '#6366f1'); g.addColorStop(1, '#ec4899');
+  x.fillStyle = g; x.fillRect(0, 0, 240, 180); x.font = '72px serif'; x.textAlign = 'center'; x.fillText('😎', 120, 110);
+  return c.toDataURL('image/jpeg', 0.6);
+}
+function simPartnerRespond(i, redo = false) {
+  setTimeout(() => {
+    const p = state.partner, q = state.activities[i], prev = p.answers[i];
+    if (!prev || redo) {
+      const t = q.t === 'photo' ? 'photo' : q.t === 'text' ? 'text' : 'pick';
+      const val = t === 'photo' ? demoPhoto() : t === 'text' ? (redo ? 'Honestly? You.' : 'Surprise me 😉') : q.o[redo ? 1 : 0];
+      p.answers[i] = { t, val, v: prev ? prev.v + 1 : 1 };
+    }
+    if (state.myAnswers[i]) p.verdicts[i] = { v: state.myAnswers[i].v, s: 'ok' };
+    recomputeSoul(); renderQuestCards(); updateQuestProgressUI();
+  }, 1100);
+}
+
+// Camera + mic start only after all 3 questions are approved; peer connections wait until both sides are ready.
+async function startSoulMedia() {
+  if (state.mediaReady) return;
+  await initMediaDevices();
+  state.mediaReady = true;
+  Object.keys(state.peers).forEach(uid => maybeConnectMedia(uid, { ...state.peers[uid], mediaReady: state.partner.mediaReady }));
+  await syncLocalPresence();
+}
+function maybeConnectMedia(uid, data) {
+  const p = state.peers[uid];
+  if (!p || p.pc || state.isSimulatedPartner) return;
+  if (state.mediaReady && data.mediaReady) createPeerConnection(uid, data.name, data.muted, data.camOff, currentUser.uid < uid);
+}
+
+// ===== Init =====
+window.addEventListener('DOMContentLoaded', async () => {
+  lucide.createIcons();
+  updateLobbyPreview();
+  await initBackend();
+  if (state.purpose !== 'soulmate') await initMediaDevices();
+});
+
+function pick(selector, attr, value) {
+  document.querySelectorAll(selector).forEach(b => b.classList.toggle('on', b.getAttribute(attr) === value));
+}
+window.selectGender = (g) => { state.gender = g; if (g !== 'Non-Binary') selectInterest(g === 'Male' ? 'Female' : 'Male'); pick('.gender-btn', 'data-gender', g); updateLobbyPreview(); };
+window.selectInterest = (i) => { state.interest = i; pick('.interest-btn', 'data-interest', i); };
+window.selectPurpose = (p) => {
+  state.purpose = p; pick('.purpose-btn', 'data-purpose', p);
+  $('stream-selector-container').classList.toggle('hidden', p !== 'professional');
+  $('interest-container').classList.toggle('hidden', p !== 'soulmate');
+  if (p !== 'soulmate' && !state.localStream) initMediaDevices();
+  updateLobbyPreview();
+};
+window.selectStream = (s) => { state.streamType = s; pick('.stream-btn', 'data-stream', s); updateLobbyPreview(); };
+
+function updateLobbyPreview() {
+  state.activities = generateDynamicActivities(state.purpose, state.gender, state.streamType);
+  const p = PURPOSE_LABELS[state.purpose];
+  $('lobby-quest-badge').textContent = `${p.icon} ${p.title}${state.purpose === 'professional' ? ' • ' + state.streamType : ''} • ${state.gender}`;
+  $('lobby-activity-preview').innerHTML = state.purpose === 'soulmate' ? SOUL_PREVIEW : state.activities.map((a, i) => `
+    <div class="bg-dark-900 border border-zinc-800/90 p-3 rounded-xl flex flex-col gap-1">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Quest ${i + 1}</span>
+      <p class="text-xs font-semibold text-white line-clamp-1">${escapeHTML(a.title)}</p>
+      <p class="text-[11px] text-zinc-400 line-clamp-2">${escapeHTML(a.desc)}</p>
+    </div>`).join('');
+  lucide.createIcons();
+}
+
+async function initBackend() {
+  const pill = $('connection-status-pill');
+  try {
+    if (!firebaseConfig) throw new Error('Missing cloud config');
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+    else await signInAnonymously(auth);
+    currentUser = auth.currentUser;
+    pill.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online & Ready';
+  } catch (err) {
+    console.error('Online initialization error:', err);
+    db = null; currentUser = null;
+    pill.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-500"></span> Demo Mode';
+  }
+}
+
+// ===== Media =====
+async function initMediaDevices() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }, audio: true });
+    state.localStream = stream; state.camEnabled = true; state.micEnabled = true;
+    attachLocalStream(stream);
+  } catch (err) {
+    console.warn('Media devices unavailable or permission denied:', err);
+    state.camEnabled = false; state.micEnabled = false;
+    $('lobby-status-text').textContent = 'Camera unavailable — Audio/Avatar Mode ready';
+  }
+  updateMediaButtonsUI();
+}
+
+function attachLocalStream(stream) {
+  const on = stream && stream.getVideoTracks().length > 0 && state.camEnabled;
+  if (on) { $('lobby-video').srcObject = stream; $('local-video').srcObject = stream; }
+  $('lobby-video').classList.toggle('hidden', !on);
+  $('local-video').classList.toggle('hidden', !on);
+  $('lobby-placeholder').classList.toggle('hidden', !!on);
+  $('local-avatar').classList.toggle('hidden', !!on);
+}
+
+window.toggleMic = () => {
+  state.micEnabled = !state.micEnabled;
+  state.localStream?.getAudioTracks().forEach(t => t.enabled = state.micEnabled);
+  updateMediaButtonsUI(); syncLocalPresence();
+  showToast(state.micEnabled ? 'Microphone unmuted' : 'Microphone muted');
+};
+
+window.toggleCam = async () => {
+  state.camEnabled = !state.camEnabled;
+  if (state.camEnabled && !state.localStream) { await initMediaDevices(); syncLocalPresence(); return; }
+  state.localStream?.getVideoTracks().forEach(t => t.enabled = state.camEnabled);
+  attachLocalStream(state.localStream); updateMediaButtonsUI(); syncLocalPresence();
+  showToast(state.camEnabled ? 'Camera turned on' : 'Camera turned off');
+};
+
+function updateMediaButtonsUI() {
+  const set = (ids, on, iconOn, iconOff) => ids.forEach(id => {
+    const b = $(id); if (!b) return;
+    const small = id.startsWith('lobby');
+    b.classList.toggle('off', !on);
+    b.innerHTML = `<i data-lucide="${on ? iconOn : iconOff}" class="${small ? 'w-4 h-4' : 'w-5 h-5'}"></i>`;
+  });
+  set(['lobby-mic-btn', 'room-mic-btn'], state.micEnabled, 'mic', 'mic-off');
+  set(['lobby-cam-btn', 'room-cam-btn'], state.camEnabled, 'video', 'video-off');
+  const ind = $('local-mic-indicator');
+  ind.className = `w-8 h-8 rounded-xl backdrop-blur-md border flex items-center justify-center ${state.micEnabled ? 'bg-dark-950/75 border-zinc-800/80 text-emerald-400' : 'bg-rose-600/90 border-rose-500 text-white'}`;
+  ind.innerHTML = `<i data-lucide="${state.micEnabled ? 'mic' : 'mic-off'}" class="w-4 h-4"></i>`;
+  lucide.createIcons();
+}
+
+window.toggleScreenShare = async () => {
+  if (state.isScreenSharing) return stopScreenShare();
+  try {
+    const s = await navigator.mediaDevices.getDisplayMedia({ video: true });
+    state.screenStream = s; state.isScreenSharing = true;
+    const track = s.getVideoTracks()[0];
+    replaceOutgoingVideoTrack(track);
+    $('local-video').srcObject = s;
+    $('local-video').classList.remove('hidden', '-scale-x-100');
+    $('local-avatar').classList.add('hidden');
+    $('screen-share-badge').classList.remove('hidden');
+    $('screen-share-btn').classList.add('live');
+    showToast('Screen sharing started');
+    track.onended = stopScreenShare;
+  } catch (e) { showToast('Screen sharing cancelled or unsupported'); }
+};
+
+function stopScreenShare() {
+  state.screenStream?.getTracks().forEach(t => t.stop());
+  state.screenStream = null; state.isScreenSharing = false;
+  $('screen-share-badge').classList.add('hidden');
+  $('local-video').classList.add('-scale-x-100');
+  $('screen-share-btn').classList.remove('live');
+  replaceOutgoingVideoTrack(state.localStream?.getVideoTracks()[0] || null);
+  attachLocalStream(state.localStream);
+  showToast('Screen sharing stopped');
+}
+
+function replaceOutgoingVideoTrack(track) {
+  if (!track) return;
+  Object.values(state.peers).forEach(p => {
+    const sender = p.pc?.getSenders().find(s => s.track && s.track.kind === 'video');
+    sender?.replaceTrack(track).catch(e => console.warn('Track replace error:', e));
+  });
+}
+
+// Grab a small JPEG frame from the camera (null if camera is off)
+function captureFrame() {
+  if (!state.camEnabled || state.isScreenSharing) return null;
+  const v = [$('local-video'), $('lobby-video')].find(x => x && x.videoWidth > 0);
+  if (!v) return null;
+  const c = document.createElement('canvas');
+  c.width = 240; c.height = Math.round(240 * v.videoHeight / v.videoWidth);
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.6);
+}
+
+window.generateRoomCode = () => {
+  $('room-input').value = `${Math.random().toString(36).substring(2, 5)}-${Math.floor(100 + Math.random() * 900)}-${Math.floor(100 + Math.random() * 900)}`;
+};
+
+function ageOk() {
+  if (!$('age-check').checked) { showToast('Please confirm you are 18+ first'); return false; }
+  if (state.purpose === 'soulmate' && state.gender === 'Non-Binary') { showToast('Soulmate matching for Non-Binary is coming soon. Try another purpose for now.'); return false; }
+  return true;
+}
+
+// ===== Matchmaking =====
+window.joinRandomRoom = async () => {
+  if (!ageOk()) return;
+  if (!currentUser || !db) { showToast('Waiting for online connection...'); return; }
+  showToast('Searching for an open public room...');
+  try {
+    const soul = state.purpose === 'soulmate';
+    // Soulmate: look for someone waiting who is [my interest] and wants [my gender]; otherwise wait in my own queue.
+    const ref = doc(...pub('random_matchmaking', soul ? `soul_${state.interest}_${state.gender}` : 'current_open_room'));
+    const myRef = soul ? doc(...pub('random_matchmaking', `soul_${state.gender}_${state.interest}`)) : ref;
+    const snap = await getDoc(ref);
+    const now = Date.now();
+    let target = null;
+    if (snap.exists()) {
+      const d = snap.data();
+      if (d.roomCode && d.hostUid !== currentUser.uid && !getBlocked().has(d.hostUid) && now - (d.updatedAt || 0) < 45000) {
+        target = d.roomCode;
+        await deleteDoc(ref);
+      }
+    }
+    if (!target) {
+      target = `pub-${Math.random().toString(36).substring(2, 6)}-${Math.floor(100 + Math.random() * 900)}`;
+      await setDoc(myRef, { roomCode: target, hostUid: currentUser.uid, updatedAt: now });
+    }
+    $('room-input').value = target;
+    await joinMeeting(true);
+  } catch (err) {
+    console.error('Matchmaking error:', err);
+    showToast('Matchmaking failed, joining generated room');
+    generateRoomCode();
+    await joinMeeting(true);
+  }
+};
+
+window.nextRandomRoom = async () => { await cleanupMeetingState(); await joinRandomRoom(); };
+window.joinCode = () => joinMeeting(false);
+
+window.startSimulatedMatch = async () => {
+  if (!ageOk()) return;
+  generateRoomCode();
+  await joinMeeting(false, true);
+  const names = { soulmate: 'Maya Lin', friend: 'Jordan Vance', timepass: 'Leo Sparks', professional: 'Priya Nair' };
+  const name = names[state.purpose];
+  $('partner-progress-name').textContent = `${name}'s Progress`;
+  $('chat-partner-status').textContent = 'Demo partner';
+  appendChatBubble(name, `Hey ${state.username}! Let's complete these 3 ${PURPOSE_LABELS[state.purpose].title} quests so we can unlock our live video call! 🎉`, false, Date.now());
+  showToast(`Matched with ${name}! Complete the 3 quests.`);
+};
+
+// ===== Join / leave =====
+window.joinMeeting = async (isRandom = false, sim = false) => {
+  if (!ageOk()) return;
+  state.username = $('username-input').value.trim() || 'Alex Rivera';
+  state.roomCode = $('room-input').value.trim() || 'nxm-849-201';
+  state.isRandomMode = isRandom; state.isSimulatedPartner = sim; state.inMeeting = true;
+  state.myCompleted = { 0: false, 1: false, 2: false };
+  state.partnerCompleted = { 0: false, 1: false, 2: false };
+  state.videoUnlocked = false;
+  state.myAnswers = {}; state.myVerdicts = {}; state.partner = { answers: {}, verdicts: {}, mediaReady: false }; state.mediaReady = false;
+  state.activities = state.purpose === 'soulmate' ? pickQuestions(state.roomCode) : generateDynamicActivities(state.purpose, state.gender, state.streamType);
+  $('partner-progress-name').textContent = "Partner's Progress";
+  $('chat-partner-status').textContent = 'Waiting for partner';
+
+  const p = PURPOSE_LABELS[state.purpose];
+  $('local-initials').textContent = state.username.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  $('local-name-tag').textContent = `${state.username} (You)`;
+  $('active-room-code').textContent = state.roomCode;
+  $('room-title-display').textContent = `${p.title} Room`;
+  $('purpose-pill-header').textContent = `${p.icon} ${p.title}${state.purpose === 'professional' ? ' • ' + state.streamType : ''}`;
+  $('my-role-label').textContent = state.gender;
+
+  const nb = $('next-random-btn');
+  nb.classList.toggle('hidden', !isRandom); nb.classList.toggle('flex', isRandom);
+  const sb = $('simulate-partner-btn'), showSim = sim && state.purpose !== 'soulmate';
+  sb.classList.toggle('hidden', !showSim); sb.classList.toggle('flex', showSim);
+
+  $('lobby-screen').classList.add('hidden');
+  $('room-screen').classList.remove('hidden');
+  switchStageView('quest', true);
+
+  $('chat-messages').innerHTML = `<div class="bg-dark-800/70 border border-zinc-800 rounded-xl p-3 text-xs text-zinc-400 text-center">🔒 Video Call is locked. Complete all 3 <span class="text-indigo-400 font-semibold">${escapeHTML(p.title)}</span> activities with your partner to unlock live video!</div>`;
+  renderQuestCards(); updateQuestProgressUI();
+
+  if (currentUser && db && !sim) {
+    await registerInRoom();
+    listenToRoomParticipants(); listenToIncomingSignals(); listenToRoomChat(); listenToRoomReactions();
+  }
+  startMeetingTimer(); updateMediaButtonsUI(); renderPeers();
+};
+
+window.switchStageView = (view, force = false) => {
+  if (view === 'video' && !state.videoUnlocked && !force) { showToast('🔒 Complete all 3 activities (both you & your partner) to unlock the Video Call!'); return; }
+  state.stageView = view;
+  if (view === 'video' && state.purpose === 'soulmate') startSoulMedia();
+  const q = view === 'quest';
+  $('quest-stage').classList.toggle('hidden', !q);
+  $('video-stage').classList.toggle('hidden', q);
+  $('view-quest-btn').className = `px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${q ? 'bg-indigo-600 text-white' : 'text-zinc-400 hover:text-white'}`;
+  $('view-video-btn').className = `px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${q ? 'text-zinc-400 hover:text-white' : 'bg-emerald-600 text-white'}`;
+  if (!q && state.isSimulatedPartner && !state.peers['demo-partner']) {
+    state.peers['demo-partner'] = { uid: 'demo-partner', name: $('partner-progress-name').textContent.replace("'s Progress", ''), muted: false, camOff: true, pc: null, stream: null };
+    renderPeers();
+  }
+};
+
+// ===== Quest cards =====
+function renderQuestCards() {
+  if (state.purpose === 'soulmate') return renderSoulCards();
+  const container = $('quest-cards-container');
+  const saved = {};
+  container.querySelectorAll('input[id^="quest-text-input-"]').forEach(i => saved[i.id] = i.value);
+
+  container.innerHTML = state.activities.map((a, idx) => {
+    const done = state.myCompleted[idx], pDone = state.partnerCompleted[idx];
+    let body = '';
+    if (done) {
+      body = `<div class="mt-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 flex items-center justify-between text-xs text-emerald-300"><span class="flex items-center gap-2 font-semibold"><i data-lucide="check-circle-2" class="w-4 h-4"></i> You completed this activity & shared to chat!</span><span>${pDone ? '✅ Partner Done' : '⏳ Waiting for partner'}</span></div>`;
+    } else if (a.type === 'photo') {
+      body = `<div class="mt-3 flex flex-wrap items-center gap-2.5"><button onclick="completePhotoActivity(${idx})" class="px-4 py-2.5 primary flex items-center gap-2 shadow-lg shadow-indigo-600/20"><i data-lucide="camera" class="w-4 h-4"></i><span>${escapeHTML(a.buttonText)}</span></button><span class="text-[11px] text-zinc-500">Shares a small photo from your camera (a text card if the camera is off)</span></div>`;
+    } else if (a.type === 'text') {
+      body = `<div class="mt-3 flex flex-col sm:flex-row gap-2"><input type="text" id="quest-text-input-${idx}" maxlength="300" placeholder="${escapeHTML(a.placeholder)}" class="inp flex-1 !text-xs sm:!text-sm"><button onclick="completeTextActivity(${idx})" class="px-4 py-2.5 primary flex items-center justify-center gap-1.5 shrink-0"><i data-lucide="send" class="w-3.5 h-3.5"></i><span>${escapeHTML(a.buttonText)}</span></button></div>`;
+    } else {
+      body = `<div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">${a.options.map((o, oi) => `<button onclick="completeChoiceActivity(${idx},${oi})" class="opt p-2.5 text-left text-xs hover:!bg-indigo-600/20 hover:!border-indigo-500">${escapeHTML(o)}</button>`).join('')}</div>`;
+    }
+    return `
+      <div class="bg-dark-900 border ${done ? 'border-emerald-500/40' : 'border-zinc-800'} rounded-2xl p-4 sm:p-5 shadow-lg transition-all">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl ${done ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/15 text-indigo-400'} flex items-center justify-center shrink-0"><i data-lucide="${a.icon}" class="w-5 h-5"></i></div>
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider ${done ? 'text-emerald-400' : 'text-indigo-400'}">${escapeHTML(a.badge)}</span>
+              <h4 class="text-sm sm:text-base font-bold text-white">${escapeHTML(a.title)}</h4>
+            </div>
+          </div>
+          <span class="px-2.5 py-1 rounded-full text-[11px] font-medium shrink-0 ${pDone ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-dark-800 text-zinc-400 border border-zinc-700'}">${pDone ? 'Partner: Done ✓' : 'Partner: Pending'}</span>
+        </div>
+        <p class="text-xs text-zinc-400 mt-2">${escapeHTML(a.desc)}</p>
+        ${body}
+      </div>`;
+  }).join('');
+
+  Object.entries(saved).forEach(([id, v]) => { const el = $(id); if (el) el.value = v; });
+  lucide.createIcons();
+}
+
+window.completePhotoActivity = async (idx) => {
+  const img = captureFrame();
+  await markQuestCompleted(idx, img ? `📸 Shared a live photo for Quest ${idx + 1}!` : `📸 Camera is off, so here's a vibe card for "${state.activities[idx].title}"!`, img);
+};
+window.completeTextActivity = async (idx) => {
+  const val = ($(`quest-text-input-${idx}`)?.value || '').trim();
+  if (!val) { showToast('Please write a short note first!'); return; }
+  await markQuestCompleted(idx, `✍️ Quest ${idx + 1} Note: "${val}"`);
+};
+window.completeChoiceActivity = (idx, oi) => markQuestCompleted(idx, `🎯 Quest ${idx + 1} Pick: ${state.activities[idx].options[oi]}`);
+
+async function markQuestCompleted(idx, text, img = null) {
+  state.myCompleted[idx] = true;
+  renderQuestCards(); updateQuestProgressUI();
+  await syncLocalPresence();
+
+  if (currentUser && db && !state.isSimulatedPartner) {
+    try {
+      await addDoc(collection(...pub(`room_${state.roomCode}_chat`)), { senderUid: currentUser.uid, senderName: state.username, text, img, isActivity: true, ts: Date.now() });
+    } catch (e) { appendChatBubble(state.username, text, true, Date.now(), img); }
+  } else {
+    appendChatBubble(state.username, text, true, Date.now(), img);
+  }
+  if (state.isSimulatedPartner) {
+    setTimeout(() => { if (!state.partnerCompleted[idx]) simulatePartnerSpecificStep(idx); }, 1100);
+  }
+}
+
+window.simulatePartnerStep = () => {
+  const i = [0, 1, 2].find(n => !state.partnerCompleted[n]);
+  if (i === undefined) showToast('Partner has already completed all 3 activities!'); else simulatePartnerSpecificStep(i);
+};
+
+function simulatePartnerSpecificStep(idx) {
+  state.partnerCompleted[idx] = true;
+  const replies = [
+    '📸 Shared a smiling selfie & desk item!',
+    `✍️ Quest 2 Note: "You seem super genuine and fun to talk to, ${state.username}! Can't wait to connect on video."`,
+    `🎯 Quest 3 Pick: ${state.activities[2]?.options?.[0] || 'Ready for our hangout!'}`
+  ];
+  appendChatBubble('Your Match', replies[idx], false, Date.now());
+  renderQuestCards(); updateQuestProgressUI();
+}
+
+function updateQuestProgressUI() {
+  const my = Object.values(state.myCompleted).filter(Boolean).length;
+  const pt = Object.values(state.partnerCompleted).filter(Boolean).length;
+  $('my-quest-score').textContent = `${my} / 3 Done`;
+  $('partner-quest-score').textContent = `${pt} / 3 Done`;
+  $('header-quest-count').textContent = `${my}/3`;
+  $('my-progress-bar').style.width = `${my / 3 * 100}%`;
+  $('partner-progress-bar').style.width = `${pt / 3 * 100}%`;
+
+  const was = state.videoUnlocked;
+  state.videoUnlocked = my === 3 && pt === 3;
+  const btn = $('launch-video-call-btn'), icon = $('unlock-status-icon'), lock = $('video-tab-lock-wrapper');
+  if (state.videoUnlocked) {
+    btn.disabled = false;
+    btn.className = 'px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 animate-bounce cursor-pointer shrink-0';
+    btn.innerHTML = '<i data-lucide="video" class="w-4 h-4"></i><span>Start Video Call Now!</span>';
+    icon.className = 'w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0';
+    icon.innerHTML = '<i data-lucide="unlock" class="w-6 h-6"></i>';
+    $('unlock-banner-title').textContent = '🎉 All 3 Activities Completed! Video Call Unlocked!';
+    $('unlock-banner-subtitle').textContent = 'Both of you passed the vibe check. Click "Start Video Call Now!" to connect face-to-face.';
+    lock.innerHTML = '<i data-lucide="unlock" class="w-3.5 h-3.5 text-emerald-400"></i>';
+    if (!was) { spawnFloatingEmoji('🎉'); spawnFloatingEmoji('🔓'); showToast('🔓 Video Call Unlocked! Click "Start Video Call Now!"'); }
+  } else {
+    btn.disabled = true;
+    btn.className = 'px-5 py-3 rounded-xl bg-zinc-800 text-zinc-500 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 cursor-not-allowed shrink-0';
+    btn.innerHTML = `<i data-lucide="lock" class="w-4 h-4"></i><span>Locked (${my + pt}/6 Total)</span>`;
+    icon.className = 'w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0';
+    icon.innerHTML = '<i data-lucide="lock" class="w-6 h-6"></i>';
+    $('unlock-banner-title').textContent = 'Complete 3 Activities to Unlock Video Call';
+    $('unlock-banner-subtitle').textContent = 'Both you and your match must complete the 3 tailored quests below.';
+    lock.innerHTML = '<i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i>';
+  }
+  lucide.createIcons();
+}
+
+// ===== Presence / signaling =====
+async function registerInRoom() {
+  await setDoc(doc(...pub(`room_${state.roomCode}_peers`, currentUser.uid)), {
+    uid: currentUser.uid, name: state.username, gender: state.gender, purpose: state.purpose,
+    interest: state.interest, answers: state.myAnswers, verdicts: state.myVerdicts, mediaReady: state.mediaReady,
+    completed: state.myCompleted, muted: !state.micEnabled, camOff: !state.camEnabled,
+    joinedAt: Date.now(), lastSeen: Date.now()
+  });
+  clearInterval(state.heartbeatInterval);
+  state.heartbeatInterval = setInterval(() => { if (state.inMeeting) syncLocalPresence(); }, 10000);
+}
+
+async function syncLocalPresence() {
+  if (!state.inMeeting || !currentUser || !db || state.isSimulatedPartner) return;
+  try {
+    await updateDoc(doc(...pub(`room_${state.roomCode}_peers`, currentUser.uid)), {
+      muted: !state.micEnabled, camOff: !state.camEnabled, completed: state.myCompleted, answers: state.myAnswers, verdicts: state.myVerdicts, mediaReady: state.mediaReady, lastSeen: Date.now()
+    });
+  } catch (e) {}
+}
+
+function listenToRoomParticipants() {
+  state.unsubRoomPeers = onSnapshot(collection(...pub(`room_${state.roomCode}_peers`)), (snap) => {
+    const now = Date.now(), active = new Set(), blocked = getBlocked();
+    let incompatible = false;
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.uid === currentUser.uid || blocked.has(data.uid)) return;
+      if (now - (data.lastSeen || 0) > 35000) return;
+      if (state.purpose === 'soulmate' && !soulCompatible(data)) { incompatible = true; return; }
+      active.add(data.uid);
+      if (state.purpose === 'soulmate') onSoulPartner(data);
+      else if (data.completed) {
+        state.partnerCompleted = data.completed;
+        $('partner-progress-name').textContent = `${data.name}'s Progress (${data.gender || 'Match'})`;
+        renderQuestCards(); updateQuestProgressUI();
+      }
+      if (!state.peers[data.uid]) {
+        if (state.purpose === 'soulmate') state.peers[data.uid] = { uid: data.uid, name: data.name, muted: data.muted, camOff: data.camOff, pc: null, stream: null };
+        else createPeerConnection(data.uid, data.name, data.muted, data.camOff, currentUser.uid < data.uid);
+        showToast(`${data.name} joined the quest room!`);
+      } else {
+        Object.assign(state.peers[data.uid], { name: data.name, muted: data.muted, camOff: data.camOff });
+      }
+      if (state.purpose === 'soulmate') maybeConnectMedia(data.uid, data);
+    });
+    if (incompatible) { showToast('Soulmate rooms are for matching interests only'); leaveMeeting(); return; }
+    Object.keys(state.peers).forEach(uid => {
+      if (!active.has(uid)) { const n = state.peers[uid].name; closePeerConnection(uid); showToast(`${n} left the room`); }
+    });
+    const st = $('chat-partner-status'), has = active.size > 0;
+    st.textContent = has ? 'Partner Connected' : 'Waiting for partner';
+    st.className = `text-[11px] px-2.5 py-0.5 rounded-full border ${has ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-zinc-400 bg-dark-800 border-zinc-700'}`;
+    renderPeers();
+  }, (err) => console.error('Peers listener error:', err));
+}
+
+async function createPeerConnection(remoteUid, remoteName, muted, camOff, isInitiator) {
+  const pc = new RTCPeerConnection(rtcConfig);
+  const remoteStream = new MediaStream();
+  state.peers[remoteUid] = { uid: remoteUid, name: remoteName, muted, camOff, pc, stream: remoteStream };
+  state.localStream?.getTracks().forEach(t => pc.addTrack(t, state.localStream));
+
+  pc.ontrack = (e) => {
+    e.streams[0].getTracks().forEach(t => { if (!remoteStream.getTracks().includes(t)) remoteStream.addTrack(t); });
+    const v = $(`video-${remoteUid}`);
+    if (v) { v.srcObject = remoteStream; }
+  };
+
+  const signals = collection(...pub(`room_${state.roomCode}_signals`));
+  pc.onicecandidate = async (e) => {
+    if (e.candidate) await addDoc(signals, { from: currentUser.uid, to: remoteUid, type: 'candidate', candidate: e.candidate.toJSON(), ts: Date.now() }).catch(() => {});
+  };
+
+  if (isInitiator) {
+    try {
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await addDoc(signals, { from: currentUser.uid, to: remoteUid, type: 'offer', sdp: { type: offer.type, sdp: offer.sdp }, ts: Date.now() });
+    } catch (err) { console.error('Error creating WebRTC offer:', err); }
+  }
+  renderPeers();
+}
+
+function listenToIncomingSignals() {
+  const signals = collection(...pub(`room_${state.roomCode}_signals`));
+  const done = new Set();
+  state.unsubSignals = onSnapshot(signals, async (snap) => {
+    for (const change of snap.docChanges()) {
+      if (change.type !== 'added' || done.has(change.doc.id)) continue;
+      done.add(change.doc.id);
+      const data = change.doc.data();
+      if (data.to !== currentUser.uid || getBlocked().has(data.from)) continue;
+
+      let peer = state.peers[data.from];
+      if (!peer && data.type === 'offer') {
+        await createPeerConnection(data.from, 'Participant', false, false, false);
+        peer = state.peers[data.from];
+      }
+      if (!peer?.pc) continue;
+      try {
+        if (data.type === 'offer') {
+          await peer.pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+          const answer = await peer.pc.createAnswer();
+          await peer.pc.setLocalDescription(answer);
+          await addDoc(signals, { from: currentUser.uid, to: data.from, type: 'answer', sdp: { type: answer.type, sdp: answer.sdp }, ts: Date.now() });
+        } else if (data.type === 'answer') {
+          if (peer.pc.signalingState === 'have-local-offer') await peer.pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+        } else if (data.type === 'candidate') {
+          await peer.pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+      } catch (err) { console.warn('WebRTC signaling warning:', err); }
+      deleteDoc(change.doc.ref).catch(() => {});
+    }
+  }, (err) => console.error('Signals listener error:', err));
+}
+
+function closePeerConnection(uid) {
+  state.peers[uid]?.pc?.close();
+  delete state.peers[uid];
+}
+
+// ===== Leave & cleanup =====
+window.leaveMeeting = async () => {
+  await cleanupMeetingState();
+  $('room-screen').classList.add('hidden');
+  $('lobby-screen').classList.remove('hidden');
+  showToast('You left the meeting');
+};
+
+async function deleteAll(name) {
+  const snap = await getDocs(collection(...pub(name)));
+  await Promise.all(snap.docs.map(d => deleteDoc(d.ref).catch(() => {})));
+}
+
+async function cleanupMeetingState() {
+  if (state.isScreenSharing) stopScreenShare();
+  stopSoulCam();
+  const wasLive = state.inMeeting && currentUser && db && !state.isSimulatedPartner;
+  const room = state.roomCode;
+  const alone = Object.keys(state.peers).length === 0;
+
+  state.inMeeting = false;
+  clearInterval(state.timerInterval); clearInterval(state.heartbeatInterval);
+  state.timerSeconds = 0;
+  [state.unsubRoomPeers, state.unsubSignals, state.unsubChat, state.unsubReactions].forEach(u => u && u());
+  Object.keys(state.peers).forEach(closePeerConnection);
+  document.querySelectorAll('.remote-peer-tile').forEach(el => el.remove());
+
+  if (!wasLive) return;
+  try {
+    await deleteDoc(doc(...pub(`room_${room}_peers`, currentUser.uid)));
+    if (alone) {
+      // Last one out: remove leftover chat, signals, reactions, and stale presence docs.
+      await Promise.all([`room_${room}_chat`, `room_${room}_signals`, `room_${room}_reactions`, `room_${room}_peers`].map(deleteAll));
+    }
+    if (state.isRandomMode) {
+      const ref = doc(...pub('random_matchmaking', state.purpose === 'soulmate' ? `soul_${state.gender}_${state.interest}` : 'current_open_room'));
+      const s = await getDoc(ref);
+      if (s.exists() && s.data().hostUid === currentUser.uid) await deleteDoc(ref);
+    }
+  } catch (e) { console.warn('Cleanup warning:', e); }
+}
+
+window.addEventListener('beforeunload', () => {
+  if (state.inMeeting && currentUser && db && !state.isSimulatedPartner) deleteDoc(doc(...pub(`room_${state.roomCode}_peers`, currentUser.uid))).catch(() => {});
+});
+
+// ===== Report / block =====
+function partnerUid() { return Object.keys(state.peers).find(u => u !== 'demo-partner'); }
+
+window.openReport = () => {
+  if (!partnerUid()) { showToast('No partner in the room to report yet'); return; }
+  $('report-modal').classList.remove('hidden');
+};
+window.closeReport = () => $('report-modal').classList.add('hidden');
+
+window.submitReport = async () => {
+  const uid = partnerUid(), reason = $('report-reason').value;
+  closeReport();
+  if (!uid) return;
+  if (reason !== 'block-only' && currentUser && db) {
+    try { await addDoc(collection(...pub('reports_log')), { reporter: currentUser.uid, reported: uid, room: state.roomCode, reason, ts: Date.now() }); } catch (e) {}
+  }
+  addBlocked(uid);
+  const random = state.isRandomMode;
+  showToast(reason === 'block-only' ? 'Partner blocked' : 'Report sent. Partner blocked');
+  if (random) await nextRandomRoom(); else await leaveMeeting();
+};
+
+// ===== Video grid =====
+const GRADS = ['from-emerald-500 to-teal-600', 'from-amber-500 to-orange-600', 'from-pink-500 to-rose-600', 'from-cyan-500 to-blue-600'];
+const initialsOf = (n) => (n || 'GU').split(' ').map(x => x[0]).join('').toUpperCase().substring(0, 2);
+
+function renderPeers() {
+  const grid = $('video-grid'), list = $('participants-list');
+  const peers = Object.values(state.peers);
+
+  document.querySelectorAll('.remote-peer-tile').forEach(el => { if (!state.peers[el.dataset.uid]) el.remove(); });
+
+  peers.forEach((p, i) => {
+    const grad = GRADS[i % GRADS.length];
+    let tile = $(`tile-${p.uid}`);
+    if (!tile) {
+      tile = document.createElement('div');
+      tile.id = `tile-${p.uid}`; tile.dataset.uid = p.uid;
+      tile.className = 'remote-peer-tile relative bg-dark-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-lg flex items-center justify-center';
+      tile.innerHTML = `
+        <video id="video-${p.uid}" autoplay playsinline class="w-full h-full object-cover ${p.camOff ? 'hidden' : ''}"></video>
+        <div id="avatar-${p.uid}" class="${p.camOff ? 'flex' : 'hidden'} flex-col items-center justify-center"><div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br ${grad} flex items-center justify-center text-2xl sm:text-3xl font-bold text-white shadow-lg">${escapeHTML(initialsOf(p.name))}</div></div>
+        <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+          <div class="bg-dark-950/75 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800/80"><span id="name-${p.uid}" class="text-xs sm:text-sm font-medium text-white"></span></div>
+          <div id="mic-${p.uid}"></div>
+        </div>`;
+      grid.appendChild(tile);
+      if (p.stream) $(`video-${p.uid}`).srcObject = p.stream;
+    }
+    $(`name-${p.uid}`).textContent = p.name;
+    $(`video-${p.uid}`).classList.toggle('hidden', !!p.camOff);
+    const av = $(`avatar-${p.uid}`); av.classList.toggle('hidden', !p.camOff); av.classList.toggle('flex', !!p.camOff);
+    const mic = $(`mic-${p.uid}`);
+    mic.className = `w-8 h-8 rounded-xl backdrop-blur-md border flex items-center justify-center ${p.muted ? 'bg-rose-600/90 border-rose-500 text-white' : 'bg-dark-950/75 border-zinc-800/80 text-emerald-400'}`;
+    mic.innerHTML = `<i data-lucide="${p.muted ? 'mic-off' : 'mic'}" class="w-4 h-4"></i>`;
+  });
+
+  const total = peers.length + 1;
+  $('participant-count').textContent = total;
+  $('footer-peer-count').textContent = total;
+  list.innerHTML = `
+    <div class="flex items-center justify-between p-2.5 rounded-xl bg-dark-800/60 border border-zinc-800">
+      <div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white">${escapeHTML($('local-initials').textContent)}</div>
+      <div><p class="text-xs font-medium text-white">${escapeHTML(state.username)} (You)</p><p class="text-[11px] text-zinc-400">Online</p></div></div>
+      <span class="text-[11px] text-emerald-400 font-medium">Connected</span>
+    </div>` + peers.map((p, i) => `
+    <div class="flex items-center justify-between p-2.5 rounded-xl bg-dark-800/40 border border-zinc-800/60">
+      <div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-full bg-gradient-to-br ${GRADS[i % GRADS.length]} flex items-center justify-center text-xs font-bold text-white">${escapeHTML(initialsOf(p.name))}</div>
+      <div><p class="text-xs font-medium text-white">${escapeHTML(p.name)}</p><p class="text-[11px] text-zinc-400">${p.muted ? 'Muted' : 'Audio Active'}</p></div></div>
+      <span class="text-[11px] text-emerald-400 font-medium">Live</span>
+    </div>`).join('');
+  lucide.createIcons();
+}
+
+// ===== Chat & reactions =====
+function listenToRoomChat() {
+  const seen = new Set();
+  state.unsubChat = onSnapshot(collection(...pub(`room_${state.roomCode}_chat`)), (snap) => {
+    const msgs = [];
+    snap.docChanges().forEach(c => { if (c.type === 'added' && !seen.has(c.doc.id)) { seen.add(c.doc.id); msgs.push(c.doc.data()); } });
+    msgs.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    const blocked = getBlocked();
+    msgs.forEach(m => {
+      if (blocked.has(m.senderUid)) return;
+      const self = m.senderUid === currentUser.uid;
+      appendChatBubble(m.senderName, m.text, self, m.ts, m.img);
+      if (!self && (!state.drawerOpen || state.activeTab !== 'chat')) $('chat-badge').classList.remove('hidden');
+    });
+  }, (err) => console.error('Chat listener error:', err));
+}
+
+window.sendChatMessage = async (e) => {
+  e.preventDefault();
+  const input = $('chat-input'), text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  if (!currentUser || !db || state.isSimulatedPartner) { appendChatBubble(state.username, text, true, Date.now()); return; }
+  try {
+    await addDoc(collection(...pub(`room_${state.roomCode}_chat`)), { senderUid: currentUser.uid, senderName: state.username, text, ts: Date.now() });
+  } catch (err) { showToast('Failed to send message'); }
+};
+
+function appendChatBubble(sender, text, isSelf, ts, img) {
+  const c = $('chat-messages');
+  const time = new Date(ts || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const safeImg = typeof img === 'string' && img.startsWith('data:image/jpeg;base64,') ? img : null;
+  const w = document.createElement('div');
+  w.className = `flex flex-col ${isSelf ? 'items-end' : 'items-start'}`;
+  w.innerHTML = `
+    <div class="flex items-center gap-1.5 mb-1 px-1"><span class="text-[11px] font-medium text-zinc-400">${isSelf ? 'You' : escapeHTML(sender)}</span><span class="text-[10px] text-zinc-500">${time}</span></div>
+    <div class="max-w-[85%] px-3.5 py-2.5 rounded-2xl text-xs sm:text-sm ${isSelf ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-dark-800 text-zinc-100 border border-zinc-700/70 rounded-bl-sm'}">
+      ${escapeHTML(text)}${safeImg ? `<img src="${safeImg}" alt="Shared photo" class="mt-2 rounded-xl w-full max-w-[240px]">` : ''}
+    </div>`;
+  c.appendChild(w);
+  c.scrollTop = c.scrollHeight;
+}
+
+function listenToRoomReactions() {
+  const joined = Date.now(), seen = new Set();
+  state.unsubReactions = onSnapshot(collection(...pub(`room_${state.roomCode}_reactions`)), (snap) => {
+    snap.docChanges().forEach(c => {
+      if (c.type === 'added' && !seen.has(c.doc.id)) {
+        seen.add(c.doc.id);
+        const d = c.doc.data();
+        if ((d.ts || 0) >= joined - 2000) spawnFloatingEmoji(d.emoji);
+      }
+    });
+  }, (err) => console.error('Reactions listener error:', err));
+}
+
+window.toggleReactionMenu = () => $('reaction-menu').classList.toggle('hidden');
+window.triggerReaction = async (emoji) => {
+  $('reaction-menu').classList.add('hidden');
+  if (!currentUser || !db || state.isSimulatedPartner) { spawnFloatingEmoji(emoji); return; }
+  try { await addDoc(collection(...pub(`room_${state.roomCode}_reactions`)), { emoji, senderUid: currentUser.uid, ts: Date.now() }); }
+  catch (e) { spawnFloatingEmoji(emoji); }
+};
+
+function spawnFloatingEmoji(emoji) {
+  const el = document.createElement('div');
+  el.textContent = emoji;
+  el.style.left = `${20 + Math.random() * 60}%`; el.style.bottom = '90px';
+  el.className = 'fixed text-4xl transition-all duration-1000 ease-out opacity-100';
+  $('reactions-overlay').appendChild(el);
+  requestAnimationFrame(() => { el.style.transform = 'translateY(-220px) scale(1.3)'; el.style.opacity = '0'; });
+  setTimeout(() => el.remove(), 1100);
+}
+
+// ===== Drawer =====
+window.openDrawerTab = (tab) => {
+  if (state.drawerOpen && state.activeTab === tab) return toggleDrawer();
+  state.drawerOpen = true; $('side-drawer').classList.remove('hidden'); switchTab(tab);
+};
+window.toggleDrawer = () => { state.drawerOpen = !state.drawerOpen; $('side-drawer').classList.toggle('hidden', !state.drawerOpen); };
+window.switchTab = (tab) => {
+  state.activeTab = tab;
+  const chat = tab === 'chat';
+  $('tab-chat').className = `flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${chat ? 'bg-dark-700 text-white' : 'text-zinc-400 hover:text-white'}`;
+  $('tab-participants').className = `flex-1 py-1.5 text-xs font-medium rounded-lg transition-all ${chat ? 'text-zinc-400 hover:text-white' : 'bg-dark-700 text-white'}`;
+  $('panel-chat').classList.toggle('hidden', !chat);
+  $('panel-participants').classList.toggle('hidden', chat);
+  if (chat) $('chat-badge').classList.add('hidden');
+};
+
+// ===== Utilities =====
+window.copyRoomLink = async () => {
+  try { await navigator.clipboard.writeText(state.roomCode); }
+  catch (e) { const t = document.createElement('input'); t.value = state.roomCode; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+  showToast(`Room code "${state.roomCode}" copied!`);
+};
+
+function startMeetingTimer() {
+  clearInterval(state.timerInterval); state.timerSeconds = 0;
+  state.timerInterval = setInterval(() => {
+    state.timerSeconds++;
+    $('meeting-timer').textContent = `${String(Math.floor(state.timerSeconds / 60)).padStart(2, '0')}:${String(state.timerSeconds % 60).padStart(2, '0')}`;
+  }, 1000);
+}
+
+let toastTimeout;
+function showToast(msg) {
+  const t = $('toast');
+  $('toast-message').textContent = msg;
+  t.classList.remove('opacity-0', '-translate-y-2');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.add('opacity-0', '-translate-y-2'), 2500);
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+}
+</script>
+</body>
+</html>
